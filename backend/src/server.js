@@ -12,6 +12,7 @@ import chatRoutes from "./routes/chatRoutes.js";
 import sessionRoutes from "./routes/sessionRoute.js";
 import dns from "node:dns";
 import webhookRoutes from "./routes/webhok.routes.js";
+import runCodeRouter from "./routes/runCode.route.js";
 
 // Fixes the ECONNREFUSED by forcing IPv4 and stable DNS
 dns.setDefaultResultOrder("ipv4first");
@@ -29,7 +30,7 @@ app.use(clerkMiddleware()); // this adds auth field to request object: req.auth(
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/chat", chatRoutes);
 app.use("/api/sessions", sessionRoutes);
-
+app.use("/api/run-code", runCodeRouter);
 app.use("/api/webhooks", webhookRoutes);
 
 app.get("/health", (req, res) => {
