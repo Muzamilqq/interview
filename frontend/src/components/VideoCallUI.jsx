@@ -7,7 +7,14 @@ import {
 import { Loader2Icon, MessageSquareIcon, UsersIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { Channel, Chat, MessageInput, MessageList, Thread, Window } from "stream-chat-react";
+import {
+  Channel,
+  Chat,
+  MessageInput,
+  MessageList,
+  Thread,
+  Window,
+} from "stream-chat-react";
 
 import "@stream-io/video-react-sdk/dist/css/styles.css";
 import "stream-chat-react/dist/css/v2/index.css";
@@ -21,68 +28,205 @@ function VideoCallUI({ chatClient, channel }) {
 
   if (callingState === CallingState.JOINING) {
     return (
-      <div className="h-full flex items-center justify-center">
-        <div className="text-center">
-          <Loader2Icon className="w-12 h-12 mx-auto animate-spin text-primary mb-4" />
-          <p className="text-lg">Joining call...</p>
+      <div
+        style={{
+          height: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div style={{ textAlign: "center" }}>
+          <Loader2Icon
+            size={40}
+            color="#3B82F6"
+            style={{
+              animation: "spin 1s linear infinite",
+              display: "block",
+              margin: "0 auto 16px",
+            }}
+          />
+          <p
+            style={{
+              fontFamily: "'Outfit', sans-serif",
+              fontSize: "16px",
+              color: "rgba(200,214,240,0.7)",
+            }}
+          >
+            Joining call...
+          </p>
         </div>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
 
   return (
-    <div className="h-full flex gap-3 relative str-video">
-      <div className="flex-1 flex flex-col gap-3">
-        {/* Participants count badge and Chat Toggle */}
-        <div className="flex items-center justify-between gap-2 bg-base-100 p-3 rounded-lg shadow">
-          <div className="flex items-center gap-2">
-            <UsersIcon className="w-5 h-5 text-primary" />
-            <span className="font-semibold">
-              {participantCount} {participantCount === 1 ? "participant" : "participants"}
+    <div
+      style={{
+        height: "100%",
+        display: "flex",
+        gap: "12px",
+        position: "relative",
+      }}
+      className="str-video"
+    >
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          gap: "10px",
+        }}
+      >
+        {/* TOOLBAR */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            background: "rgba(15,23,42,0.8)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(59,130,246,0.12)",
+            borderRadius: "12px",
+            padding: "10px 16px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <UsersIcon size={16} color="#3B82F6" />
+            <span
+              style={{
+                fontFamily: "'Outfit', sans-serif",
+                fontWeight: 600,
+                fontSize: "14px",
+                color: "rgba(200,214,240,0.8)",
+              }}
+            >
+              {participantCount}{" "}
+              {participantCount === 1 ? "participant" : "participants"}
             </span>
           </div>
+
           {chatClient && channel && (
             <button
               onClick={() => setIsChatOpen(!isChatOpen)}
-              className={`btn btn-sm gap-2 ${isChatOpen ? "btn-primary" : "btn-ghost"}`}
-              title={isChatOpen ? "Hide chat" : "Show chat"}
+              style={{
+                background: isChatOpen
+                  ? "rgba(59,130,246,0.2)"
+                  : "rgba(59,130,246,0.08)",
+                border: `1px solid ${isChatOpen ? "rgba(59,130,246,0.35)" : "rgba(59,130,246,0.15)"}`,
+                borderRadius: "8px",
+                padding: "6px 12px",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: "6px",
+                fontFamily: "'Outfit', sans-serif",
+                fontWeight: 600,
+                fontSize: "13px",
+                color: isChatOpen ? "#3B82F6" : "rgba(200,214,240,0.6)",
+                transition: "all 0.2s",
+              }}
             >
-              <MessageSquareIcon className="size-4" />
-              Chat
+              <MessageSquareIcon size={14} /> Chat
             </button>
           )}
         </div>
 
-        <div className="flex-1 bg-base-300 rounded-lg overflow-hidden relative">
+        {/* VIDEO */}
+        <div
+          style={{
+            flex: 1,
+            background: "rgba(11,16,32,0.8)",
+            border: "1px solid rgba(59,130,246,0.1)",
+            borderRadius: "14px",
+            overflow: "hidden",
+            position: "relative",
+          }}
+        >
           <SpeakerLayout />
         </div>
 
-        <div className="bg-base-100 p-3 rounded-lg shadow flex justify-center">
+        {/* CONTROLS */}
+        <div
+          style={{
+            background: "rgba(15,23,42,0.8)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(59,130,246,0.1)",
+            borderRadius: "12px",
+            padding: "10px",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
           <CallControls onLeave={() => navigate("/dashboard")} />
         </div>
       </div>
 
-      {/* CHAT SECTION */}
-
+      {/* CHAT PANEL */}
       {chatClient && channel && (
         <div
-          className={`flex flex-col rounded-lg shadow overflow-hidden bg-[#272a30] transition-all duration-300 ease-in-out ${
-            isChatOpen ? "w-80 opacity-100" : "w-0 opacity-0"
-          }`}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            borderRadius: "14px",
+            overflow: "hidden",
+            background: "#1a1f2e",
+            border: "1px solid rgba(59,130,246,0.12)",
+            transition: "all 0.3s ease",
+            width: isChatOpen ? "300px" : "0px",
+            opacity: isChatOpen ? 1 : 0,
+            flexShrink: 0,
+          }}
         >
           {isChatOpen && (
             <>
-              <div className="bg-[#1c1e22] p-3 border-b border-[#3a3d44] flex items-center justify-between">
-                <h3 className="font-semibold text-white">Session Chat</h3>
+              <div
+                style={{
+                  background: "rgba(15,23,42,0.9)",
+                  padding: "12px 16px",
+                  borderBottom: "1px solid rgba(59,130,246,0.1)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: "'Outfit', sans-serif",
+                    fontWeight: 700,
+                    fontSize: "14px",
+                    color: "#F0F4FF",
+                  }}
+                >
+                  Session Chat
+                </span>
                 <button
                   onClick={() => setIsChatOpen(false)}
-                  className="text-gray-400 hover:text-white transition-colors"
-                  title="Close chat"
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    cursor: "pointer",
+                    color: "rgba(200,214,240,0.4)",
+                    padding: "4px",
+                    display: "flex",
+                    alignItems: "center",
+                    transition: "color 0.2s",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.color = "#F0F4FF")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.color = "rgba(200,214,240,0.4)")
+                  }
                 >
-                  <XIcon className="size-5" />
+                  <XIcon size={16} />
                 </button>
               </div>
-              <div className="flex-1 overflow-hidden stream-chat-dark">
+              <div
+                style={{ flex: 1, overflow: "hidden" }}
+                className="stream-chat-dark"
+              >
                 <Chat client={chatClient} theme="str-chat__theme-dark">
                   <Channel channel={channel}>
                     <Window>
@@ -97,7 +241,10 @@ function VideoCallUI({ chatClient, channel }) {
           )}
         </div>
       )}
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
+
 export default VideoCallUI;

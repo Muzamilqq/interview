@@ -11,55 +11,134 @@ function CodeEditorPanel({
   onRunCode,
 }) {
   return (
-    <div className="h-full bg-base-300 flex flex-col">
-      <div className="flex items-center justify-between px-4 py-3 bg-base-100 border-t border-base-300">
-        <div className="flex items-center gap-3">
+    <div
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        background: "#0B1020",
+      }}
+    >
+      {/* TOOLBAR */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "10px 16px",
+          background: "rgba(15,23,42,0.9)",
+          borderBottom: "1px solid rgba(59,130,246,0.1)",
+          borderTop: "1px solid rgba(59,130,246,0.08)",
+          backdropFilter: "blur(8px)",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
           <img
             src={LANGUAGE_CONFIG[selectedLanguage].icon}
             alt={LANGUAGE_CONFIG[selectedLanguage].name}
-            className="size-6"
+            style={{ width: "22px", height: "22px" }}
           />
-          <select className="select select-sm" value={selectedLanguage} onChange={onLanguageChange}>
+          <select
+            style={{
+              background: "rgba(11,16,32,0.9)",
+              border: "1px solid rgba(59,130,246,0.15)",
+              borderRadius: "8px",
+              color: "#F0F4FF",
+              fontFamily: "'JetBrains Mono', monospace",
+              fontSize: "13px",
+              padding: "6px 10px",
+              outline: "none",
+              cursor: "pointer",
+              transition: "border-color 0.2s",
+              appearance: "none",
+            }}
+            value={selectedLanguage}
+            onChange={onLanguageChange}
+            onFocus={(e) => (e.currentTarget.style.borderColor = "#3B82F6")}
+            onBlur={(e) =>
+              (e.currentTarget.style.borderColor = "rgba(59,130,246,0.15)")
+            }
+          >
             {Object.entries(LANGUAGE_CONFIG).map(([key, lang]) => (
-              <option key={key} value={key}>
+              <option key={key} value={key} style={{ background: "#111827" }}>
                 {lang.name}
               </option>
             ))}
           </select>
         </div>
 
-        <button className="btn btn-primary btn-sm gap-2" disabled={isRunning} onClick={onRunCode}>
+        <button
+          style={{
+            background: isRunning
+              ? "rgba(59,130,246,0.15)"
+              : "linear-gradient(135deg, #3B82F6, #2563EB)",
+            color: isRunning ? "rgba(200,214,240,0.5)" : "#fff",
+            border: "none",
+            borderRadius: "9px",
+            padding: "8px 18px",
+            fontFamily: "'Outfit', sans-serif",
+            fontWeight: 600,
+            fontSize: "13px",
+            cursor: isRunning ? "not-allowed" : "pointer",
+            display: "flex",
+            alignItems: "center",
+            gap: "7px",
+            boxShadow: isRunning ? "none" : "0 3px 12px rgba(59,130,246,0.3)",
+            transition: "all 0.2s",
+          }}
+          disabled={isRunning}
+          onClick={onRunCode}
+          onMouseEnter={(e) => {
+            if (!isRunning) {
+              e.currentTarget.style.transform = "translateY(-1px)";
+              e.currentTarget.style.boxShadow =
+                "0 5px 18px rgba(59,130,246,0.45)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = "translateY(0)";
+            e.currentTarget.style.boxShadow = "0 3px 12px rgba(59,130,246,0.3)";
+          }}
+        >
           {isRunning ? (
             <>
-              <Loader2Icon className="size-4 animate-spin" />
+              <Loader2Icon
+                size={14}
+                style={{ animation: "spin 1s linear infinite" }}
+              />{" "}
               Running...
             </>
           ) : (
             <>
-              <PlayIcon className="size-4" />
-              Run Code
+              <PlayIcon size={14} /> Run Code
             </>
           )}
         </button>
       </div>
 
-      <div className="flex-1">
+      <div style={{ flex: 1 }}>
         <Editor
-          height={"100%"}
+          height="100%"
           language={LANGUAGE_CONFIG[selectedLanguage].monacoLang}
           value={code}
           onChange={onCodeChange}
           theme="vs-dark"
           options={{
-            fontSize: 16,
+            fontSize: 15,
             lineNumbers: "on",
             scrollBeyondLastLine: false,
             automaticLayout: true,
             minimap: { enabled: false },
+            fontFamily: "'JetBrains Mono', monospace",
+            fontLigatures: true,
+            padding: { top: 12 },
           }}
         />
       </div>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 }
+
 export default CodeEditorPanel;

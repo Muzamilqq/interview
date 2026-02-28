@@ -2,31 +2,164 @@ import { TrophyIcon, UsersIcon } from "lucide-react";
 
 function StatsCards({ activeSessionsCount, recentSessionsCount }) {
   return (
-    <div className="lg:col-span-1 grid grid-cols-1 gap-6">
-      {/* Active Count */}
-      <div className="card bg-base-100 border-2 border-primary/20 hover:border-primary/40">
-        <div className="card-body">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-primary/10 rounded-2xl">
-              <UsersIcon className="w-7 h-7 text-primary" />
-            </div>
-            <div className="badge badge-primary">Live</div>
+    <div
+      style={{
+        gridColumn: "span 1",
+        display: "grid",
+        gridTemplateColumns: "1fr",
+        gap: "16px",
+      }}
+    >
+      {/* Active Sessions */}
+      <div
+        style={{
+          background: "rgba(15,23,42,0.65)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          border: "1px solid rgba(59,130,246,0.15)",
+          borderRadius: "16px",
+          padding: "24px",
+          transition: "all 0.25s ease",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = "rgba(59,130,246,0.35)";
+          e.currentTarget.style.boxShadow =
+            "0 12px 40px rgba(0,0,0,0.4), 0 0 20px rgba(59,130,246,0.08)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = "rgba(59,130,246,0.15)";
+          e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.3)";
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: "16px",
+          }}
+        >
+          <div
+            style={{
+              width: "44px",
+              height: "44px",
+              borderRadius: "12px",
+              background: "rgba(59,130,246,0.12)",
+              border: "1px solid rgba(59,130,246,0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#3B82F6",
+            }}
+          >
+            <UsersIcon size={22} />
           </div>
-          <div className="text-4xl font-black mb-1">{activeSessionsCount}</div>
-          <div className="text-sm opacity-60">Active Sessions</div>
+          <span
+            style={{
+              background: "rgba(59,130,246,0.1)",
+              border: "1px solid rgba(59,130,246,0.25)",
+              borderRadius: "999px",
+              padding: "3px 10px",
+              fontSize: "11px",
+              fontWeight: 600,
+              color: "#3B82F6",
+              letterSpacing: "0.04em",
+              fontFamily: "'Outfit', sans-serif",
+            }}
+          >
+            LIVE
+          </span>
+        </div>
+        <div
+          style={{
+            fontFamily: "'Syne', sans-serif",
+            fontWeight: 800,
+            fontSize: "42px",
+            color: "#F0F4FF",
+            lineHeight: 1,
+          }}
+        >
+          {activeSessionsCount}
+        </div>
+        <div
+          style={{
+            fontFamily: "'Outfit', sans-serif",
+            fontSize: "13px",
+            color: "rgba(150,170,210,0.55)",
+            marginTop: "6px",
+          }}
+        >
+          Active Sessions
         </div>
       </div>
 
-      {/* Recent Count */}
-      <div className="card bg-base-100 border-2 border-secondary/20 hover:border-secondary/40">
-        <div className="card-body">
-          <div className="flex items-center justify-between mb-3">
-            <div className="p-3 bg-secondary/10 rounded-2xl">
-              <TrophyIcon className="w-7 h-7 text-secondary" />
-            </div>
+      {/* Total Sessions */}
+      <div
+        style={{
+          background: "rgba(15,23,42,0.65)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          border: "1px solid rgba(20,184,166,0.15)",
+          borderRadius: "16px",
+          padding: "24px",
+          transition: "all 0.25s ease",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.3)",
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.borderColor = "rgba(20,184,166,0.35)";
+          e.currentTarget.style.boxShadow =
+            "0 12px 40px rgba(0,0,0,0.4), 0 0 20px rgba(20,184,166,0.08)";
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.borderColor = "rgba(20,184,166,0.15)";
+          e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,0,0,0.3)";
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginBottom: "16px",
+          }}
+        >
+          <div
+            style={{
+              width: "44px",
+              height: "44px",
+              borderRadius: "12px",
+              background: "rgba(20,184,166,0.12)",
+              border: "1px solid rgba(20,184,166,0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#14B8A6",
+            }}
+          >
+            <TrophyIcon size={22} />
           </div>
-          <div className="text-4xl font-black mb-1">{recentSessionsCount}</div>
-          <div className="text-sm opacity-60">Total Sessions</div>
+        </div>
+        <div
+          style={{
+            fontFamily: "'Syne', sans-serif",
+            fontWeight: 800,
+            fontSize: "42px",
+            color: "#F0F4FF",
+            lineHeight: 1,
+          }}
+        >
+          {recentSessionsCount}
+        </div>
+        <div
+          style={{
+            fontFamily: "'Outfit', sans-serif",
+            fontSize: "13px",
+            color: "rgba(150,170,210,0.55)",
+            marginTop: "6px",
+          }}
+        >
+          Total Sessions
         </div>
       </div>
     </div>

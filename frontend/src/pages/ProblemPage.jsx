@@ -2,13 +2,11 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { PROBLEMS } from "../data/problems";
 import Navbar from "../components/Navbar";
-
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import ProblemDescription from "../components/ProblemDescription";
 import OutputPanel from "../components/OutputPanel";
 import CodeEditorPanel from "../components/CodeEditorPanel";
 import { executeCode } from "../lib/jdoodle";
-
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
 
@@ -26,7 +24,6 @@ function ProblemPage() {
 
   const currentProblem = PROBLEMS[currentProblemId];
 
-  // update problem when URL param changes
   useEffect(() => {
     if (id && PROBLEMS[id]) {
       setCurrentProblemId(id);
@@ -46,59 +43,36 @@ function ProblemPage() {
     navigate(`/problem/${newProblemId}`);
 
   const triggerConfetti = () => {
-    confetti({
-      particleCount: 80,
-      spread: 250,
-      origin: { x: 0.2, y: 0.6 },
-    });
-
-    confetti({
-      particleCount: 80,
-      spread: 250,
-      origin: { x: 0.8, y: 0.6 },
-    });
+    confetti({ particleCount: 80, spread: 250, origin: { x: 0.2, y: 0.6 } });
+    confetti({ particleCount: 80, spread: 250, origin: { x: 0.8, y: 0.6 } });
   };
 
-  const normalizeOutput = (output) => {
-    // normalize output for comparison (trim whitespace, handle different spacing)
-    return output
+  const normalizeOutput = (output) =>
+    output
       .trim()
       .split("\n")
       .map((line) =>
         line
           .trim()
-          // remove spaces after [ and before ]
           .replace(/\[\s+/g, "[")
           .replace(/\s+\]/g, "]")
-          // normalize spaces around commas to single space after comma
           .replace(/\s*,\s*/g, ","),
       )
       .filter((line) => line.length > 0)
       .join("\n");
-  };
 
-  const checkIfTestsPassed = (actualOutput, expectedOutput) => {
-    const normalizedActual = normalizeOutput(actualOutput);
-    const normalizedExpected = normalizeOutput(expectedOutput);
-
-    return normalizedActual == normalizedExpected;
-  };
+  const checkIfTestsPassed = (actual, expected) =>
+    normalizeOutput(actual) === normalizeOutput(expected);
 
   const handleRunCode = async () => {
     setIsRunning(true);
     setOutput(null);
-
     const result = await executeCode(selectedLanguage, code);
     setOutput(result);
     setIsRunning(false);
-
-    // check if code executed successfully and matches expected output
-
     if (result.success) {
       const expectedOutput = currentProblem.expectedOutput[selectedLanguage];
-      const testsPassed = checkIfTestsPassed(result.output, expectedOutput);
-
-      if (testsPassed) {
+      if (checkIfTestsPassed(result.output, expectedOutput)) {
         triggerConfetti();
         toast.success("All tests passed! Great job!");
       } else {
@@ -110,12 +84,17 @@ function ProblemPage() {
   };
 
   return (
-    <div className="h-screen bg-base-100 flex flex-col">
+    <div
+      style={{
+        height: "100vh",
+        background: "#0B1020",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <Navbar />
-
-      <div className="flex-1">
+      <div style={{ flex: 1, overflow: "hidden" }}>
         <PanelGroup direction="horizontal">
-          {/* left panel- problem desc */}
           <Panel defaultSize={40} minSize={30}>
             <ProblemDescription
               problem={currentProblem}
@@ -125,12 +104,21 @@ function ProblemPage() {
             />
           </Panel>
 
-          <PanelResizeHandle className="w-2 bg-base-300 hover:bg-primary transition-colors cursor-col-resize" />
+          <PanelResizeHandle
+            style={{
+              width: "4px",
+              background: "rgba(59,130,246,0.1)",
+              cursor: "col-resize",
+              transition: "background 0.2s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = "#3B82F6")}
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.background = "rgba(59,130,246,0.1)")
+            }
+          />
 
-          {/* right panel- code editor & output */}
           <Panel defaultSize={60} minSize={30}>
             <PanelGroup direction="vertical">
-              {/* Top panel - Code editor */}
               <Panel defaultSize={70} minSize={30}>
                 <CodeEditorPanel
                   selectedLanguage={selectedLanguage}
@@ -142,11 +130,22 @@ function ProblemPage() {
                 />
               </Panel>
 
-              <PanelResizeHandle className="h-2 bg-base-300 hover:bg-primary transition-colors cursor-row-resize" />
+              <PanelResizeHandle
+                style={{
+                  height: "4px",
+                  background: "rgba(59,130,246,0.1)",
+                  cursor: "row-resize",
+                  transition: "background 0.2s",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.background = "#3B82F6")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.background = "rgba(59,130,246,0.1)")
+                }
+              />
 
-              {/* Bottom panel - Output Panel*/}
-
-              <Panel defaultSize={30} minSize={30}>
+              <Panel defaultSize={30} minSize={15}>
                 <OutputPanel output={output} />
               </Panel>
             </PanelGroup>

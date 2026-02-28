@@ -10,14 +10,30 @@ import { PROBLEMS } from "../data/problems";
 import { executeCode } from "../lib/jdoodle";
 import Navbar from "../components/Navbar";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import { getDifficultyBadgeClass } from "../lib/utils";
 import { Loader2Icon, LogOutIcon, PhoneOffIcon } from "lucide-react";
 import CodeEditorPanel from "../components/CodeEditorPanel";
 import OutputPanel from "../components/OutputPanel";
-
 import useStreamClient from "../hooks/useStreamClient";
 import { StreamCall, StreamVideo } from "@stream-io/video-react-sdk";
 import VideoCallUI from "../components/VideoCallUI";
+
+const difficultyStyle = {
+  easy: {
+    bg: "rgba(16,185,129,0.1)",
+    border: "rgba(16,185,129,0.25)",
+    text: "#10B981",
+  },
+  medium: {
+    bg: "rgba(245,158,11,0.1)",
+    border: "rgba(245,158,11,0.25)",
+    text: "#F59E0B",
+  },
+  hard: {
+    bg: "rgba(239,68,68,0.1)",
+    border: "rgba(239,68,68,0.25)",
+    text: "#EF4444",
+  },
+};
 
 function SessionPage() {
   const navigate = useNavigate();
@@ -31,7 +47,6 @@ function SessionPage() {
     isLoading: loadingSession,
     refetch,
   } = useSessionById(id);
-
   const joinSessionMutation = useJoinSession();
   const endSessionMutation = useEndSession();
 
@@ -42,7 +57,6 @@ function SessionPage() {
   const { call, channel, chatClient, isInitializingCall, streamClient } =
     useStreamClient(session, loadingSession, isHost, isParticipant);
 
-  // find the problem data based on session problem title
   const problemData = session?.problem
     ? Object.values(PROBLEMS).find((p) => p.title === session.problem)
     : null;
@@ -52,24 +66,17 @@ function SessionPage() {
     problemData?.starterCode?.[selectedLanguage] || "",
   );
 
-  // auto-join session if user is not already a participant and not the host
   useEffect(() => {
     if (!session || !user || loadingSession) return;
     if (isHost || isParticipant) return;
-
     joinSessionMutation.mutate(id, { onSuccess: refetch });
-
-    // remove the joinSessionMutation, refetch from dependencies to avoid infinite loop
   }, [session, user, loadingSession, isHost, isParticipant, id]);
 
-  // redirect the "participant" when session ends
   useEffect(() => {
     if (!session || loadingSession) return;
-
     if (session.status === "completed") navigate("/dashboard");
   }, [session, loadingSession, navigate]);
 
-  // update code when problem loads or changes
   useEffect(() => {
     if (problemData?.starterCode?.[selectedLanguage]) {
       setCode(problemData.starterCode[selectedLanguage]);
@@ -79,16 +86,13 @@ function SessionPage() {
   const handleLanguageChange = (e) => {
     const newLang = e.target.value;
     setSelectedLanguage(newLang);
-    // use problem-specific starter code
-    const starterCode = problemData?.starterCode?.[newLang] || "";
-    setCode(starterCode);
+    setCode(problemData?.starterCode?.[newLang] || "");
     setOutput(null);
   };
 
   const handleRunCode = async () => {
     setIsRunning(true);
     setOutput(null);
-
     const result = await executeCode(selectedLanguage, code);
     setOutput(result);
     setIsRunning(false);
@@ -100,68 +104,176 @@ function SessionPage() {
         "Are you sure you want to end this session? All participants will be notified.",
       )
     ) {
-      // this will navigate the HOST to dashboard
       endSessionMutation.mutate(id, {
         onSuccess: () => navigate("/dashboard"),
       });
     }
   };
 
+  const diff = session?.difficulty?.toLowerCase();
+  const diffC = difficultyStyle[diff] || difficultyStyle.easy;
+
+  const sectionStyle = {
+    background: "rgba(11,16,32,0.6)",
+    border: "1px solid rgba(59,130,246,0.08)",
+    borderRadius: "12px",
+    padding: "18px",
+  };
+
   return (
-    <div className="h-screen bg-base-100 flex flex-col">
+    <div
+      style={{
+        height: "100vh",
+        background: "#0B1020",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <Navbar />
 
-      <div className="flex-1">
+      <div style={{ flex: 1, overflow: "hidden" }}>
         <PanelGroup direction="horizontal">
-          {/* LEFT PANEL - CODE EDITOR & PROBLEM DETAILS */}
+          {/* LEFT PANEL */}
           <Panel defaultSize={50} minSize={30}>
             <PanelGroup direction="vertical">
-              {/* PROBLEM DSC PANEL */}
+              {/* PROBLEM PANEL */}
               <Panel defaultSize={50} minSize={20}>
-                <div className="h-full overflow-y-auto bg-base-200">
-                  {/* HEADER SECTION */}
-                  <div className="p-6 bg-base-100 border-b border-base-300">
-                    <div className="flex items-start justify-between mb-3">
+                <div
+                  style={{
+                    height: "100%",
+                    overflowY: "auto",
+                    background: "#0B1020",
+                    fontFamily: "'Outfit', sans-serif",
+                  }}
+                >
+                  {/* HEADER */}
+                  <div
+                    style={{
+                      padding: "20px 24px",
+                      background: "rgba(15,23,42,0.85)",
+                      borderBottom: "1px solid rgba(59,130,246,0.1)",
+                      position: "sticky",
+                      top: 0,
+                      zIndex: 5,
+                      backdropFilter: "blur(12px)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "flex-start",
+                        justifyContent: "space-between",
+                        gap: "12px",
+                      }}
+                    >
                       <div>
-                        <h1 className="text-3xl font-bold text-base-content">
+                        <h1
+                          style={{
+                            fontFamily: "'Syne', sans-serif",
+                            fontWeight: 800,
+                            fontSize: "20px",
+                            color: "#F0F4FF",
+                            margin: "0 0 6px",
+                          }}
+                        >
                           {session?.problem || "Loading..."}
                         </h1>
                         {problemData?.category && (
-                          <p className="text-base-content/60 mt-1">
+                          <p
+                            style={{
+                              fontSize: "11px",
+                              fontFamily: "'JetBrains Mono', monospace",
+                              color: "rgba(150,170,210,0.45)",
+                              margin: "0 0 4px",
+                            }}
+                          >
                             {problemData.category}
                           </p>
                         )}
-                        <p className="text-base-content/60 mt-2">
-                          Host: {session?.host?.name || "Loading..."} •{" "}
+                        <p
+                          style={{
+                            fontSize: "12px",
+                            color: "rgba(150,170,210,0.5)",
+                            margin: 0,
+                          }}
+                        >
+                          Host: {session?.host?.name || "..."} ·{" "}
                           {session?.participant ? 2 : 1}/2 participants
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-3">
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                          flexShrink: 0,
+                        }}
+                      >
                         <span
-                          className={`badge badge-lg ${getDifficultyBadgeClass(
-                            session?.difficulty,
-                          )}`}
+                          style={{
+                            background: diffC.bg,
+                            border: `1px solid ${diffC.border}`,
+                            borderRadius: "999px",
+                            padding: "4px 12px",
+                            fontSize: "12px",
+                            fontWeight: 600,
+                            color: diffC.text,
+                          }}
                         >
-                          {session?.difficulty.slice(0, 1).toUpperCase() +
-                            session?.difficulty.slice(1) || "Easy"}
+                          {session?.difficulty?.slice(0, 1).toUpperCase() +
+                            session?.difficulty?.slice(1)}
                         </span>
                         {isHost && session?.status === "active" && (
                           <button
                             onClick={handleEndSession}
                             disabled={endSessionMutation.isPending}
-                            className="btn btn-error btn-sm gap-2"
+                            style={{
+                              background: "rgba(239,68,68,0.1)",
+                              color: "#EF4444",
+                              border: "1px solid rgba(239,68,68,0.25)",
+                              borderRadius: "9px",
+                              padding: "7px 14px",
+                              fontFamily: "'Outfit', sans-serif",
+                              fontWeight: 600,
+                              fontSize: "12px",
+                              cursor: "pointer",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "6px",
+                              transition: "all 0.2s",
+                            }}
+                            onMouseEnter={(e) =>
+                              (e.currentTarget.style.background =
+                                "rgba(239,68,68,0.2)")
+                            }
+                            onMouseLeave={(e) =>
+                              (e.currentTarget.style.background =
+                                "rgba(239,68,68,0.1)")
+                            }
                           >
                             {endSessionMutation.isPending ? (
-                              <Loader2Icon className="w-4 h-4 animate-spin" />
+                              <Loader2Icon
+                                size={13}
+                                style={{ animation: "spin 1s linear infinite" }}
+                              />
                             ) : (
-                              <LogOutIcon className="w-4 h-4" />
+                              <LogOutIcon size={13} />
                             )}
                             End Session
                           </button>
                         )}
                         {session?.status === "completed" && (
-                          <span className="badge badge-ghost badge-lg">
+                          <span
+                            style={{
+                              background: "rgba(150,170,210,0.08)",
+                              border: "1px solid rgba(150,170,210,0.15)",
+                              borderRadius: "999px",
+                              padding: "4px 12px",
+                              fontSize: "12px",
+                              color: "rgba(150,170,210,0.5)",
+                            }}
+                          >
                             Completed
                           </span>
                         )}
@@ -169,97 +281,212 @@ function SessionPage() {
                     </div>
                   </div>
 
-                  <div className="p-6 space-y-6">
-                    {/* problem desc */}
+                  <div
+                    style={{
+                      padding: "18px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "14px",
+                    }}
+                  >
                     {problemData?.description && (
-                      <div className="bg-base-100 rounded-xl shadow-sm p-5 border border-base-300">
-                        <h2 className="text-xl font-bold mb-4 text-base-content">
+                      <div style={sectionStyle}>
+                        <h2
+                          style={{
+                            fontFamily: "'Syne', sans-serif",
+                            fontWeight: 700,
+                            fontSize: "15px",
+                            color: "#F0F4FF",
+                            margin: "0 0 12px",
+                          }}
+                        >
                           Description
                         </h2>
-                        <div className="space-y-3 text-base leading-relaxed">
-                          <p className="text-base-content/90">
-                            {problemData.description.text}
+                        <p
+                          style={{
+                            fontSize: "13px",
+                            lineHeight: 1.75,
+                            color: "rgba(200,214,240,0.8)",
+                            margin: 0,
+                          }}
+                        >
+                          {problemData.description.text}
+                        </p>
+                        {problemData.description.notes?.map((note, i) => (
+                          <p
+                            key={i}
+                            style={{
+                              fontSize: "13px",
+                              lineHeight: 1.75,
+                              color: "rgba(200,214,240,0.75)",
+                              margin: "8px 0 0",
+                            }}
+                          >
+                            {note}
                           </p>
-                          {problemData.description.notes?.map((note, idx) => (
-                            <p key={idx} className="text-base-content/90">
-                              {note}
-                            </p>
+                        ))}
+                      </div>
+                    )}
+
+                    {problemData?.examples?.length > 0 && (
+                      <div style={sectionStyle}>
+                        <h2
+                          style={{
+                            fontFamily: "'Syne', sans-serif",
+                            fontWeight: 700,
+                            fontSize: "15px",
+                            color: "#F0F4FF",
+                            margin: "0 0 14px",
+                          }}
+                        >
+                          Examples
+                        </h2>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "12px",
+                          }}
+                        >
+                          {problemData.examples.map((example, idx) => (
+                            <div key={idx}>
+                              <p
+                                style={{
+                                  fontFamily: "'Outfit', sans-serif",
+                                  fontWeight: 600,
+                                  fontSize: "12px",
+                                  color: "rgba(200,214,240,0.6)",
+                                  margin: "0 0 6px",
+                                }}
+                              >
+                                Example {idx + 1}
+                              </p>
+                              <div
+                                style={{
+                                  background: "rgba(7,10,20,0.7)",
+                                  borderRadius: "9px",
+                                  padding: "12px",
+                                  fontFamily: "'JetBrains Mono', monospace",
+                                  fontSize: "12px",
+                                  border: "1px solid rgba(59,130,246,0.06)",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: "5px",
+                                }}
+                              >
+                                <div style={{ display: "flex", gap: "8px" }}>
+                                  <span
+                                    style={{
+                                      color: "#3B82F6",
+                                      fontWeight: 700,
+                                      minWidth: "65px",
+                                    }}
+                                  >
+                                    Input:
+                                  </span>
+                                  <span
+                                    style={{ color: "rgba(200,214,240,0.8)" }}
+                                  >
+                                    {example.input}
+                                  </span>
+                                </div>
+                                <div style={{ display: "flex", gap: "8px" }}>
+                                  <span
+                                    style={{
+                                      color: "#14B8A6",
+                                      fontWeight: 700,
+                                      minWidth: "65px",
+                                    }}
+                                  >
+                                    Output:
+                                  </span>
+                                  <span
+                                    style={{ color: "rgba(200,214,240,0.8)" }}
+                                  >
+                                    {example.output}
+                                  </span>
+                                </div>
+                                {example.explanation && (
+                                  <div
+                                    style={{
+                                      paddingTop: "8px",
+                                      borderTop:
+                                        "1px solid rgba(59,130,246,0.06)",
+                                      marginTop: "3px",
+                                    }}
+                                  >
+                                    <span
+                                      style={{
+                                        fontSize: "11px",
+                                        color: "rgba(150,170,210,0.5)",
+                                        fontFamily: "'Outfit', sans-serif",
+                                      }}
+                                    >
+                                      <strong>Explanation:</strong>{" "}
+                                      {example.explanation}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
                           ))}
                         </div>
                       </div>
                     )}
 
-                    {/* examples section */}
-                    {problemData?.examples &&
-                      problemData.examples.length > 0 && (
-                        <div className="bg-base-100 rounded-xl shadow-sm p-5 border border-base-300">
-                          <h2 className="text-xl font-bold mb-4 text-base-content">
-                            Examples
-                          </h2>
-
-                          <div className="space-y-4">
-                            {problemData.examples.map((example, idx) => (
-                              <div key={idx}>
-                                <div className="flex items-center gap-2 mb-2">
-                                  <span className="badge badge-sm">
-                                    {idx + 1}
-                                  </span>
-                                  <p className="font-semibold text-base-content">
-                                    Example {idx + 1}
-                                  </p>
-                                </div>
-                                <div className="bg-base-200 rounded-lg p-4 font-mono text-sm space-y-1.5">
-                                  <div className="flex gap-2">
-                                    <span className="text-primary font-bold min-w-[70px]">
-                                      Input:
-                                    </span>
-                                    <span>{example.input}</span>
-                                  </div>
-                                  <div className="flex gap-2">
-                                    <span className="text-secondary font-bold min-w-[70px]">
-                                      Output:
-                                    </span>
-                                    <span>{example.output}</span>
-                                  </div>
-                                  {example.explanation && (
-                                    <div className="pt-2 border-t border-base-300 mt-2">
-                                      <span className="text-base-content/60 font-sans text-xs">
-                                        <span className="font-semibold">
-                                          Explanation:
-                                        </span>{" "}
-                                        {example.explanation}
-                                      </span>
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-
-                    {/* Constraints */}
-                    {problemData?.constraints &&
-                      problemData.constraints.length > 0 && (
-                        <div className="bg-base-100 rounded-xl shadow-sm p-5 border border-base-300">
-                          <h2 className="text-xl font-bold mb-4 text-base-content">
-                            Constraints
-                          </h2>
-                          <ul className="space-y-2 text-base-content/90">
-                            {problemData.constraints.map((constraint, idx) => (
-                              <li key={idx} className="flex gap-2">
-                                <span className="text-primary">•</span>
-                                <code className="text-sm">{constraint}</code>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+                    {problemData?.constraints?.length > 0 && (
+                      <div style={sectionStyle}>
+                        <h2
+                          style={{
+                            fontFamily: "'Syne', sans-serif",
+                            fontWeight: 700,
+                            fontSize: "15px",
+                            color: "#F0F4FF",
+                            margin: "0 0 12px",
+                          }}
+                        >
+                          Constraints
+                        </h2>
+                        <ul
+                          style={{
+                            margin: 0,
+                            padding: 0,
+                            listStyle: "none",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "7px",
+                          }}
+                        >
+                          {problemData.constraints.map((c, i) => (
+                            <li key={i} style={{ display: "flex", gap: "8px" }}>
+                              <span style={{ color: "#3B82F6", flexShrink: 0 }}>
+                                •
+                              </span>
+                              <code
+                                style={{
+                                  fontFamily: "'JetBrains Mono', monospace",
+                                  fontSize: "12px",
+                                  color: "rgba(200,214,240,0.7)",
+                                }}
+                              >
+                                {c}
+                              </code>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </div>
               </Panel>
 
-              <PanelResizeHandle className="h-2 bg-base-300 hover:bg-primary transition-colors cursor-row-resize" />
+              <PanelResizeHandle
+                style={{
+                  height: "4px",
+                  background: "rgba(59,130,246,0.08)",
+                  cursor: "row-resize",
+                }}
+              />
 
               <Panel defaultSize={50} minSize={20}>
                 <PanelGroup direction="vertical">
@@ -269,13 +496,17 @@ function SessionPage() {
                       code={code}
                       isRunning={isRunning}
                       onLanguageChange={handleLanguageChange}
-                      onCodeChange={(value) => setCode(value)}
+                      onCodeChange={(v) => setCode(v)}
                       onRunCode={handleRunCode}
                     />
                   </Panel>
-
-                  <PanelResizeHandle className="h-2 bg-base-300 hover:bg-primary transition-colors cursor-row-resize" />
-
+                  <PanelResizeHandle
+                    style={{
+                      height: "4px",
+                      background: "rgba(59,130,246,0.08)",
+                      cursor: "row-resize",
+                    }}
+                  />
                   <Panel defaultSize={30} minSize={15}>
                     <OutputPanel output={output} />
                   </Panel>
@@ -284,34 +515,113 @@ function SessionPage() {
             </PanelGroup>
           </Panel>
 
-          <PanelResizeHandle className="w-2 bg-base-300 hover:bg-primary transition-colors cursor-col-resize" />
+          <PanelResizeHandle
+            style={{
+              width: "4px",
+              background: "rgba(59,130,246,0.08)",
+              cursor: "col-resize",
+            }}
+          />
 
-          {/* RIGHT PANEL - VIDEO CALLS & CHAT */}
+          {/* RIGHT PANEL - VIDEO */}
           <Panel defaultSize={50} minSize={30}>
-            <div className="h-full bg-base-200 p-4 overflow-auto">
+            <div
+              style={{
+                height: "100%",
+                background: "#0B1020",
+                padding: "12px",
+                overflow: "auto",
+              }}
+            >
               {isInitializingCall ? (
-                <div className="h-full flex items-center justify-center">
-                  <div className="text-center">
-                    <Loader2Icon className="w-12 h-12 mx-auto animate-spin text-primary mb-4" />
-                    <p className="text-lg">Connecting to video call...</p>
+                <div
+                  style={{
+                    height: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <div style={{ textAlign: "center" }}>
+                    <Loader2Icon
+                      size={40}
+                      color="#3B82F6"
+                      style={{
+                        animation: "spin 1s linear infinite",
+                        display: "block",
+                        margin: "0 auto 16px",
+                      }}
+                    />
+                    <p
+                      style={{
+                        fontFamily: "'Outfit', sans-serif",
+                        fontSize: "16px",
+                        color: "rgba(200,214,240,0.6)",
+                      }}
+                    >
+                      Connecting to video call...
+                    </p>
                   </div>
                 </div>
               ) : !streamClient || !call ? (
-                <div className="h-full flex items-center justify-center">
-                  <div className="card bg-base-100 shadow-xl max-w-md">
-                    <div className="card-body items-center text-center">
-                      <div className="w-24 h-24 bg-error/10 rounded-full flex items-center justify-center mb-4">
-                        <PhoneOffIcon className="w-12 h-12 text-error" />
-                      </div>
-                      <h2 className="card-title text-2xl">Connection Failed</h2>
-                      <p className="text-base-content/70">
-                        Unable to connect to the video call
-                      </p>
+                <div
+                  style={{
+                    height: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <div
+                    style={{
+                      background: "rgba(15,23,42,0.8)",
+                      border: "1px solid rgba(239,68,68,0.2)",
+                      borderRadius: "20px",
+                      padding: "40px",
+                      textAlign: "center",
+                      maxWidth: "360px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "80px",
+                        height: "80px",
+                        margin: "0 auto 20px",
+                        background: "rgba(239,68,68,0.08)",
+                        border: "1px solid rgba(239,68,68,0.15)",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <PhoneOffIcon size={36} color="rgba(239,68,68,0.6)" />
                     </div>
+                    <h2
+                      style={{
+                        fontFamily: "'Syne', sans-serif",
+                        fontWeight: 800,
+                        fontSize: "22px",
+                        color: "#F0F4FF",
+                        margin: "0 0 10px",
+                      }}
+                    >
+                      Connection Failed
+                    </h2>
+                    <p
+                      style={{
+                        fontFamily: "'Outfit', sans-serif",
+                        fontSize: "14px",
+                        color: "rgba(200,214,240,0.5)",
+                        margin: 0,
+                      }}
+                    >
+                      Unable to connect to the video call
+                    </p>
                   </div>
                 </div>
               ) : (
-                <div className="h-full">
+                <div style={{ height: "100%" }}>
                   <StreamVideo client={streamClient}>
                     <StreamCall call={call}>
                       <VideoCallUI chatClient={chatClient} channel={channel} />
@@ -323,6 +633,11 @@ function SessionPage() {
           </Panel>
         </PanelGroup>
       </div>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@800&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@400;500;600;700&display=swap');
+        @keyframes spin { to { transform: rotate(360deg); } }
+      `}</style>
     </div>
   );
 }

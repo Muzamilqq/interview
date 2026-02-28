@@ -1,12 +1,368 @@
-@import "tailwindcss";
-@plugin "daisyui" {
-  themes: all;
+@import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@300;400;500;600;700&display=swap");
+
+:root {
+  /* === COLORS === */
+  --bg-primary: #0b1020;
+  --bg-secondary: #111827;
+  --bg-surface: #0f1729;
+  --bg-card: rgba(17, 24, 39, 0.7);
+  --bg-card-hover: rgba(22, 31, 50, 0.85);
+
+  --accent-blue: #3b82f6;
+  --accent-teal: #14b8a6;
+  --accent-blue-dim: rgba(59, 130, 246, 0.15);
+  --accent-teal-dim: rgba(20, 184, 166, 0.15);
+  --accent-blue-glow: rgba(59, 130, 246, 0.35);
+  --accent-teal-glow: rgba(20, 184, 166, 0.35);
+
+  --text-primary: #f0f4ff;
+  --text-secondary: rgba(200, 214, 240, 0.7);
+  --text-muted: rgba(150, 170, 210, 0.45);
+
+  --border-subtle: rgba(59, 130, 246, 0.12);
+  --border-active: rgba(59, 130, 246, 0.35);
+  --border-teal: rgba(20, 184, 166, 0.25);
+
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --error-glow: rgba(239, 68, 68, 0.2);
+
+  /* === GLASS EFFECT === */
+  --glass-blur: blur(12px);
+  --glass-bg: rgba(15, 23, 42, 0.65);
+  --glass-border: 1px solid rgba(59, 130, 246, 0.15);
+  --glass-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.4), 0 0 1px rgba(59, 130, 246, 0.1);
+
+  /* === TYPOGRAPHY === */
+  --font-display: "Syne", sans-serif;
+  --font-body: "Outfit", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* === SPACING === */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
 }
 
-/* Add cursor pointer to buttons by default - this is coming from tailwind docs */
-@layer base {
-  button:not(:disabled),
-  [role="button"]:not(:disabled) {
-    cursor: pointer;
+/* === BASE RESET FOR NEW THEME === */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
+
+/* === ANIMATED BACKGROUND MESH === */
+.tiq-bg {
+  background-color: var(--bg-primary);
+  background-image:
+    radial-gradient(
+      ellipse 80% 50% at 20% 20%,
+      rgba(59, 130, 246, 0.08) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 60% 40% at 80% 80%,
+      rgba(20, 184, 166, 0.07) 0%,
+      transparent 50%
+    ),
+    radial-gradient(
+      ellipse 50% 30% at 50% 0%,
+      rgba(59, 130, 246, 0.05) 0%,
+      transparent 40%
+    );
+  min-height: 100vh;
+}
+
+/* === GLASS CARD === */
+.tiq-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+.tiq-card:hover {
+  border-color: rgba(59, 130, 246, 0.3);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(59, 130, 246, 0.08);
+}
+
+/* === GRADIENT TEXT === */
+.tiq-gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--accent-blue) 0%,
+    var(--accent-teal) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* === BUTTONS === */
+.tiq-btn-primary {
+  background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 10px 22px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.tiq-btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 25px rgba(59, 130, 246, 0.45);
+}
+.tiq-btn-primary:active {
+  transform: translateY(0);
+}
+.tiq-btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.tiq-btn-teal {
+  background: linear-gradient(135deg, var(--accent-teal) 0%, #0d9488 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  padding: 10px 22px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(20, 184, 166, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.tiq-btn-teal:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 25px rgba(20, 184, 166, 0.45);
+}
+
+.tiq-btn-ghost {
+  background: rgba(59, 130, 246, 0.08);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 10px 22px;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.tiq-btn-ghost:hover {
+  background: rgba(59, 130, 246, 0.15);
+  border-color: var(--border-active);
+  color: var(--text-primary);
+}
+
+.tiq-btn-danger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius-md);
+  padding: 8px 16px;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.tiq-btn-danger:hover {
+  background: rgba(239, 68, 68, 0.25);
+  box-shadow: 0 0 15px var(--error-glow);
+}
+
+/* === BADGE === */
+.tiq-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.tiq-badge-blue {
+  background: var(--accent-blue-dim);
+  color: var(--accent-blue);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+}
+.tiq-badge-teal {
+  background: var(--accent-teal-dim);
+  color: var(--accent-teal);
+  border: 1px solid rgba(20, 184, 166, 0.25);
+}
+.tiq-badge-success {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+.tiq-badge-warning {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+.tiq-badge-error {
+  background: var(--error-glow);
+  color: var(--error);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* === INPUTS & SELECTS === */
+.tiq-input,
+.tiq-select {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 10px 14px;
+  width: 100%;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  appearance: none;
+}
+.tiq-input:focus,
+.tiq-select:focus {
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+.tiq-select option {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+/* === SCROLLBAR === */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.25);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.45);
+}
+
+/* === GLOW PULSE ANIMATION === */
+@keyframes glowPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(20, 184, 166, 0.3);
   }
+  50% {
+    box-shadow: 0 0 20px rgba(20, 184, 166, 0.6);
+  }
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.tiq-animate-in {
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+/* === DIVIDER === */
+.tiq-divider {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin: 0;
+}
+
+/* === PANEL RESIZE HANDLE === */
+.tiq-resize-h {
+  height: 4px;
+  background: var(--border-subtle);
+  cursor: row-resize;
+  transition: background 0.2s;
+}
+.tiq-resize-h:hover {
+  background: var(--accent-blue);
+}
+
+.tiq-resize-v {
+  width: 4px;
+  background: var(--border-subtle);
+  cursor: col-resize;
+  transition: background 0.2s;
+}
+.tiq-resize-v:hover {
+  background: var(--accent-blue);
+}
+
+/* === ICON BOX === */
+.tiq-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.tiq-icon-box-blue {
+  background: var(--accent-blue-dim);
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: var(--accent-blue);
+}
+.tiq-icon-box-teal {
+  background: var(--accent-teal-dim);
+  border: 1px solid rgba(20, 184, 166, 0.2);
+  color: var(--accent-teal);
+}
+.tiq-icon-box-gradient {
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-teal));
+  color: #fff;
 }
