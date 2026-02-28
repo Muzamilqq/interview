@@ -24,7 +24,9 @@ const __dirname = path.resolve();
 // middleware
 app.use(express.json());
 // credentials:true meaning?? => server allows a browser to include cookies on request
-const allowedOrigins = ["https://interview-o4mu.vercel.app"];
+const allowedOrigins = [
+  "https://interview-o4mu-k33xqqyzr-muzamil-ashrafs-projects.vercel.app",
+];
 
 app.use(
   cors({
