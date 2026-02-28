@@ -22,18 +22,15 @@ const app = express();
 const __dirname = path.resolve();
 
 // middleware
-app.use(express.json());
-// credentials:true meaning?? => server allows a browser to include cookies on request
-const allowedOrigins = [
-  "https://interview-o4mu-k33xqqyzr-muzamil-ashrafs-projects.vercel.app",
-];
+// Use CLIENT_URL from env instead of hardcoding
+const allowedOrigins = [ENV.CLIENT_URL, "http://localhost:5173"].filter(
+  Boolean,
+); // removes undefined/null if env var missing
 
 app.use(
   cors({
     origin: function (origin, callback) {
-      // allow requests with no origin (like Postman)
       if (!origin) return callback(null, true);
-
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -55,15 +52,6 @@ app.use("/api/webhooks", webhookRoutes);
 app.get("/health", (req, res) => {
   res.status(200).json({ msg: "api is up and running" });
 });
-
-// make our app ready for deployment
-if (ENV.NODE_ENV === "production") {
-  app.use(express.static(path.join(__dirname, "../frontend/dist")));
-
-  app.get("/{*any}", (req, res) => {
-    res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-  });
-}
 
 const startServer = async () => {
   try {
