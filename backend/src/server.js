@@ -23,9 +23,10 @@ const __dirname = path.resolve();
 
 // middleware
 // Use CLIENT_URL from env instead of hardcoding
-const allowedOrigins = [ENV.CLIENT_URL, "http://localhost:5173"].filter(
-  Boolean,
-); // removes undefined/null if env var missing
+const allowedOrigins = [
+  ENV.CLIENT_URL,
+  "https://interview-o4mu.vercel.app",
+].filter(Boolean); // removes undefined/null if env var missing
 
 app.use(
   cors({
