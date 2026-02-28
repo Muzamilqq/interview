@@ -1,6 +1,7 @@
 // src/lib/jdoodle.js
 
-const BACKEND_API = "https://interview-six-omega.vercel.app/api/run-code"; // Your Express backend
+const BACKEND_API =
+  "https://distinguished-caring-production-6c96.up.railway.app/api/run-code"; // Your Express backend
 
 /**
  * Executes code via the backend proxy (which calls JDoodle API)
@@ -11,7 +12,7 @@ const BACKEND_API = "https://interview-six-omega.vercel.app/api/run-code"; // Yo
 export async function executeCode(language, code) {
   try {
     const response = await fetch(
-      "https://interview-six-omega.vercel.app/api/run-code",
+      "https://distinguished-caring-production-6c96.up.railway.app/api/run-code",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
