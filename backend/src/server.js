@@ -25,8 +25,7 @@ const __dirname = path.resolve();
 app.use(express.json());
 // credentials:true meaning?? => server allows a browser to include cookies on request
 const allowedOrigins = [
-  "https://interview-z1e3-ddu6kmbk6-muzamil-ashrafs-projects.vercel.app",
-  "https://interview-z1e3.vercel.app",
+  "https://interview-z1e3-gy6gj13fb-muzamil-ashrafs-projects.vercel.app",
 ];
 
 app.use(
