@@ -25,7 +25,7 @@ const __dirname = path.resolve();
 // Use CLIENT_URL from env instead of hardcoding
 const allowedOrigins = [
   ENV.CLIENT_URL,
-  "https://interview-o4mu.vercel.app",
+  "https://codementore.netlify.app",
 ].filter(Boolean); // removes undefined/null if env var missing
 
 app.use(
