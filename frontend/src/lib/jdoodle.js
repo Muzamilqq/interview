@@ -1,6 +1,6 @@
 // src/lib/jdoodle.js
 
-const BACKEND_API = `${import.meta.env.VITE_API_URL}/run-code`;
+const BACKEND_API = `https://distinguished-caring-production-6c96.up.railway.app/run-code`;
 
 /**
  * Executes code via the backend proxy (which calls JDoodle API)
